@@ -28,4 +28,11 @@ public class KafkaService {
 		}
 		topics.get(topic).push(data, key);
 	}
+
+	public void registerConsumer(String topic, String consumerId) {
+		if (!topics.containsKey(topic)) {
+			throw new RuntimeException("Topic does not exist");
+		}
+		topics.get(topic).registerConsumer(consumerId);
+	}
 }
