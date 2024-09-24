@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.kafka.restmodel.BaseResponse;
+import com.kafka.restmodel.ConsumerRegistrationRequest;
 import com.kafka.restmodel.CreateTopicRequest;
 import com.kafka.restmodel.PushDataRequest;
 import com.kafka.service.KafkaService;
@@ -37,6 +38,13 @@ public class KafkaServiceController {
 		String data = pushDataRequest.getData();
 		kafkaService.push(topic, key, data);
 		return new ResponseEntity<>(BaseResponse.builder().message("Pushed successfully").success(true).build(),
+				HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/register-consumer", method = RequestMethod.POST)
+	protected ResponseEntity<BaseResponse> registerConsumer(@RequestBody ConsumerRegistrationRequest request) {
+		kafkaService.registerConsumer(request.getTopic(), request.getConsumerId());
+		return new ResponseEntity<>(BaseResponse.builder().message("Consumer registered").success(true).build(),
 				HttpStatus.OK);
 	}
 }
