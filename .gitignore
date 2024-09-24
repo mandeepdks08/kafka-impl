@@ -1,0 +1,10 @@
+.classpath
+.gradle/
+.project
+.settings/
+bin/
+gradle/
+gradlew
+gradle.bat
+gradlew.bat
+src/main/resources/
