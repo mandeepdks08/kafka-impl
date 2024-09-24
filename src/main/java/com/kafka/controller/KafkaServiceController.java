@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import com.kafka.restmodel.BaseResponse;
 import com.kafka.restmodel.ConsumerRegistrationRequest;
 import com.kafka.restmodel.CreateTopicRequest;
+import com.kafka.restmodel.PollDataRequest;
 import com.kafka.restmodel.PushDataRequest;
 import com.kafka.service.KafkaService;
 
@@ -46,5 +47,10 @@ public class KafkaServiceController {
 		kafkaService.registerConsumer(request.getTopic(), request.getConsumerId());
 		return new ResponseEntity<>(BaseResponse.builder().message("Consumer registered").success(true).build(),
 				HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/poll", method = RequestMethod.POST)
+	protected void pollData(@RequestBody PollDataRequest pollDataRequest) {
+		
 	}
 }
