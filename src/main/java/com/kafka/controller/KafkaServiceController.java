@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.kafka.restmodel.BaseResponse;
 import com.kafka.restmodel.CreateTopicRequest;
+import com.kafka.restmodel.PushDataRequest;
 import com.kafka.service.KafkaService;
 
 @Controller
@@ -26,6 +27,16 @@ public class KafkaServiceController {
 		Integer ttlInSeconds = createTopicRequest.getTtlInSeconds();
 		kafkaService.createTopic(topicName, partitions, ttlInSeconds);
 		return new ResponseEntity<>(BaseResponse.builder().message("Topic created").success(true).build(),
+				HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/push", method = RequestMethod.POST)
+	protected ResponseEntity<BaseResponse> pushData(@RequestBody PushDataRequest pushDataRequest) {
+		String topic = pushDataRequest.getTopic();
+		String key = pushDataRequest.getKey();
+		String data = pushDataRequest.getData();
+		kafkaService.push(topic, key, data);
+		return new ResponseEntity<>(BaseResponse.builder().message("Pushed successfully").success(true).build(),
 				HttpStatus.OK);
 	}
 }
