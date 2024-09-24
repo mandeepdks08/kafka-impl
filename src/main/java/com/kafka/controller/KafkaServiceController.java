@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.kafka.restmodel.BaseResponse;
 import com.kafka.restmodel.CreateTopicRequest;
+import com.kafka.restmodel.PollDataRequest;
 import com.kafka.restmodel.PushDataRequest;
 import com.kafka.service.KafkaService;
 
@@ -38,5 +39,10 @@ public class KafkaServiceController {
 		kafkaService.push(topic, key, data);
 		return new ResponseEntity<>(BaseResponse.builder().message("Pushed successfully").success(true).build(),
 				HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/poll", method = RequestMethod.POST)
+	protected void pollData(@RequestBody PollDataRequest pollDataRequest) {
+		
 	}
 }
