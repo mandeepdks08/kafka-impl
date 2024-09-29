@@ -12,6 +12,7 @@ import com.kafka.restmodel.BaseResponse;
 import com.kafka.restmodel.ConsumerRegistrationRequest;
 import com.kafka.restmodel.CreateTopicRequest;
 import com.kafka.restmodel.PollDataRequest;
+import com.kafka.restmodel.PollResponse;
 import com.kafka.restmodel.PushDataRequest;
 import com.kafka.service.KafkaService;
 
@@ -48,9 +49,19 @@ public class KafkaServiceController {
 		return new ResponseEntity<>(BaseResponse.builder().message("Consumer registered").success(true).build(),
 				HttpStatus.OK);
 	}
-	
+
 	@RequestMapping(value = "/poll", method = RequestMethod.POST)
-	protected void pollData(@RequestBody PollDataRequest pollDataRequest) {
-		
+	protected ResponseEntity<PollResponse> pollData(@RequestBody PollDataRequest pollDataRequest) {
+		String topic = pollDataRequest.getTopic();
+		String consumerId = pollDataRequest.getConsumerId();
+		String data = kafkaService.poll(topic, consumerId);
+		PollResponse pollResponse = PollResponse.builder().build();
+		if (data == null) {
+			pollResponse.setMessage("No record found");
+			pollResponse.setSuccess(false);
+		} else {
+			pollResponse.setData(data);
+		}
+		return new ResponseEntity<>(pollResponse, HttpStatus.OK);
 	}
 }

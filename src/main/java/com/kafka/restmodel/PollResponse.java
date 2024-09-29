@@ -7,7 +7,6 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @SuperBuilder
-public class BaseResponse {
-	private String message;
-	private boolean success;
+public class PollResponse extends BaseResponse {
+	private String data;
 }

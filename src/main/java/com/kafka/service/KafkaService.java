@@ -23,16 +23,23 @@ public class KafkaService {
 	}
 
 	public void push(String topic, String data, String key) {
-		if (!topics.containsKey(topic)) {
-			throw new RuntimeException("Topic does not exist");
-		}
+		validateTopic(topic);
 		topics.get(topic).push(data, key);
 	}
 
 	public void registerConsumer(String topic, String consumerId) {
+		validateTopic(topic);
+		topics.get(topic).registerConsumer(consumerId);
+	}
+	
+	public String poll(String topic, String consumerId) {
+		validateTopic(topic);
+		return topics.get(topic).poll(consumerId);
+	}
+	
+	private void validateTopic(String topic) {
 		if (!topics.containsKey(topic)) {
 			throw new RuntimeException("Topic does not exist");
 		}
-		topics.get(topic).registerConsumer(consumerId);
 	}
 }
