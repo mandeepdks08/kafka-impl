@@ -12,8 +12,9 @@ public class Partition {
 	private int lastReadOffset;
 	private int lastDeletedBatchStartOffset;
 
-	public Partition(int partitionIndex) {
+	public Partition(int partitionIndex, String topicName) {
 		this.partitionIndex = partitionIndex;
+		this.topicName = topicName;
 		this.currentBatch = new Batch(0, BATCH_SIZE);
 		this.lastReadOffset = -1;
 		this.lastDeletedBatchStartOffset = -1 * BATCH_SIZE;

@@ -25,14 +25,14 @@ public class Topic {
 		this.lastPartitionPushedInto = 0;
 		this.consumers = new ArrayList<>();
 	}
-	
+
 	private void initPartitions(final Integer partitions) {
 		this.partitions = new ArrayList<>(1);
 		if (partitions != null && Arrays.stream(allowedPartitionsSize).anyMatch(size -> size == partitions)) {
 			this.partitions = new ArrayList<>(partitions);
 		}
 		for (int i = 0; i < partitions; i++) {
-			this.partitions.set(i, new Partition(i));
+			this.partitions.set(i, new Partition(i, this.name));
 		}
 	}
 
