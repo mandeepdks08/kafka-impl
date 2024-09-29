@@ -55,12 +55,4 @@ public class Batch {
 		return !isEmpty() && records.get(records.size() - 1).isExpired();
 	}
 
-	public String convertToLog() {
-		StringBuilder log = new StringBuilder("");
-		for (Record record : records) {
-			log.append(GsonUtils.getGson().toJson(record));
-			log.append("\n");
-		}
-		return log.toString();
-	}
 }
