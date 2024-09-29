@@ -39,6 +39,7 @@ public class Topic {
 	public void push(String data, String key) {
 		Partition partition = getPartitionToPushDataInto(key);
 		partition.push(data, ttlInSeconds);
+		lastPartitionPushedInto = partition.getPartitionIndex();
 	}
 
 	public void registerConsumer(String consumerId) {
@@ -87,7 +88,6 @@ public class Topic {
 		} else {
 			partitionIndex = key.hashCode() % partitionsSize;
 		}
-		lastPartitionPushedInto = partitionIndex;
 		return partitions.get(partitionIndex);
 	}
 
