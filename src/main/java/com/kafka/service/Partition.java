@@ -4,6 +4,9 @@ import com.kafka.datamodel.Record;
 import com.kafka.util.DiskSimulator;
 import com.kafka.util.GsonUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class Partition {
 	private static final int BATCH_SIZE = 1000;
 	private final int partitionIndex;
@@ -12,23 +15,25 @@ public class Partition {
 	private int lastReadOffset;
 	private int lastDeletedBatchStartOffset;
 
-	public Partition(int partitionIndex) {
+	public Partition(int partitionIndex, String topicName) {
 		this.partitionIndex = partitionIndex;
+		this.topicName = topicName;
 		this.currentBatch = new Batch(0, BATCH_SIZE);
 		this.lastReadOffset = -1;
 		this.lastDeletedBatchStartOffset = -1 * BATCH_SIZE;
 	}
 
 	public void push(String data, Integer ttlInSeconds) {
-		if (currentBatch.isFull()) {
-			offloadBatchToDisk();
-			createNewBatch();
+		synchronized (currentBatch) {
+			if (currentBatch.isFull()) {
+				offloadBatchToDisk();
+				createNewBatch();
+			}
+			currentBatch.append(new Record(data, ttlInSeconds));
 		}
-		currentBatch.append(new Record(data, ttlInSeconds));
 	}
 
-	// TODO: Need to handle offset updation case when consumer reads expired offset
-	public String poll() {
+	synchronized public String poll() {
 		int nextOffset = lastReadOffset + 1;
 		Record record = null;
 		if (nextOffset >= currentBatch.getStartOffset()) {
@@ -36,9 +41,21 @@ public class Partition {
 			record = currentBatch.getRecord(index);
 		} else {
 			record = readRecordFromDisk(nextOffset);
+			while (record == null) {
+				nextOffset = ((int)((nextOffset + BATCH_SIZE) / BATCH_SIZE)) * BATCH_SIZE;
+				if (nextOffset == currentBatch.getStartOffset()) {
+					record = currentBatch.getRecord(0);
+				} else {
+					record = readRecordFromDisk(nextOffset);
+				}
+			}
 		}
-		lastReadOffset++;
-		return record.getData();
+		if (record != null) {
+			lastReadOffset = nextOffset;
+			return record.getData();
+		} else {
+			return null;
+		}
 	}
 
 	public void deleteExpiredRecords() {
@@ -68,9 +85,14 @@ public class Partition {
 
 	private Batch readBatchFromDisk(int startOffset) {
 		String filePath = getFilePathForBatch(startOffset);
-		String fileData = DiskSimulator.read(filePath);
-		Batch batch = GsonUtils.getGson().fromJson(fileData, Batch.class);
-		return batch;
+		try {
+			String fileData = DiskSimulator.read(filePath);
+			Batch batch = GsonUtils.getGson().fromJson(fileData, Batch.class);
+			return batch;
+		} catch (Exception e) {
+			log.debug("Exception while reading file at file path: {}", filePath, e);
+		}
+		return null;
 	}
 
 	private void createNewBatch() {
@@ -79,10 +101,14 @@ public class Partition {
 	}
 
 	private Record readRecordFromDisk(int offset) {
-		int batchStartingOffset = (int) (offset / BATCH_SIZE);
+		int batchStartingOffset = ((int) (offset / BATCH_SIZE)) * BATCH_SIZE;
 		Batch batch = readBatchFromDisk(batchStartingOffset);
-		int index = offset % BATCH_SIZE;
-		return batch.getRecord(index);
+		if (batch != null) {
+			int index = offset % BATCH_SIZE;
+			return batch.getRecord(index);
+		} else {
+			return null;
+		}
 	}
 
 	public int getPartitionIndex() {
