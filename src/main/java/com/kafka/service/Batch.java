@@ -44,10 +44,11 @@ public class Batch {
 	}
 
 	public Record getRecord(int index) {
-		if (index < 0 || index >= records.size()) {
-			throw new RuntimeException("Index out of bounds");
+		if (index < records.size()) {
+			return records.get(index);
+		} else {
+			return null;
 		}
-		return records.get(index);
 	}
 
 	public boolean isExpired() {
