@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.kafka.datamodel.Record;
-import com.kafka.util.GsonUtils;
 
 public class Batch {
 	private final int startOffset;
