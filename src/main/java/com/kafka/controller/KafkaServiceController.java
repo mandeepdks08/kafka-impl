@@ -38,7 +38,7 @@ public class KafkaServiceController {
 		String topic = pushDataRequest.getTopic();
 		String key = pushDataRequest.getKey();
 		String data = pushDataRequest.getData();
-		kafkaService.push(topic, key, data);
+		kafkaService.push(topic, data, key);
 		return new ResponseEntity<>(BaseResponse.builder().message("Pushed successfully").success(true).build(),
 				HttpStatus.OK);
 	}
