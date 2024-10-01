@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+
+import com.kafka.util.GsonUtils;
 
 import lombok.Getter;
 
@@ -15,24 +18,26 @@ public class Topic {
 	private List<Consumer> consumers;
 	private Integer ttlInSeconds;
 	private Integer lastPartitionPushedInto;
-	private static final int[] allowedPartitionsSize = { 1, 2, 4, 8, 16, 32 };
+	private static final List<Integer> allowedPartitionsSize = Arrays.asList(1, 2, 4, 8, 16, 32);
 	private static final int DEFAULT_TTL_SECONDS = 30 * 60; // 30 minutes
 
 	public Topic(final String name, final Integer partitions, final Integer ttlInSeconds) {
 		this.name = name;
 		initPartitions(partitions);
 		this.ttlInSeconds = (ttlInSeconds == null || ttlInSeconds <= 0) ? DEFAULT_TTL_SECONDS : ttlInSeconds;
-		this.lastPartitionPushedInto = 0;
+		this.lastPartitionPushedInto = -1;
 		this.consumers = new ArrayList<>();
 	}
 
-	private void initPartitions(final Integer partitions) {
-		this.partitions = new ArrayList<>(1);
-		if (partitions != null && Arrays.stream(allowedPartitionsSize).anyMatch(size -> size == partitions)) {
-			this.partitions = new ArrayList<>(partitions);
+	private void initPartitions(Integer partitions) {
+		this.partitions = new ArrayList<>();
+		partitions = ObjectUtils.firstNonNull(partitions, 1);
+		if (!allowedPartitionsSize.contains(partitions)) {
+			throw new RuntimeException(
+					"Allowed number of partitions are " + GsonUtils.getGson().toJson(allowedPartitionsSize));
 		}
 		for (int i = 0; i < partitions; i++) {
-			this.partitions.set(i, new Partition(i, this.name));
+			this.partitions.add(new Partition(i, this.name));
 		}
 	}
 
