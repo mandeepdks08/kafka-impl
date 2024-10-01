@@ -42,7 +42,7 @@ public class Partition {
 		} else {
 			record = readRecordFromDisk(nextOffset);
 			while (record == null) {
-				nextOffset = ((int)((nextOffset + BATCH_SIZE) / BATCH_SIZE)) * BATCH_SIZE;
+				nextOffset = ((int) ((nextOffset + BATCH_SIZE) / BATCH_SIZE)) * BATCH_SIZE;
 				if (nextOffset == currentBatch.getStartOffset()) {
 					record = currentBatch.getRecord(0);
 				} else {
@@ -113,5 +113,18 @@ public class Partition {
 
 	public int getPartitionIndex() {
 		return partitionIndex;
+	}
+
+	public void printPartition() {
+		StringBuilder str = new StringBuilder("");
+		System.out.println("Partition number: " + partitionIndex + "\n");
+		str.append("Partition number: " + partitionIndex + "\n");
+		for (int i = 0; i < currentBatch.size(); i++) {
+			Record record = currentBatch.getRecord(i);
+			str.append(GsonUtils.getGson().toJson(record.getData()) + "\n");
+			System.out.println(GsonUtils.getGson().toJson(record.getData()) + "\n");
+		}
+		str.append("--------------PARTITION END--------------" + "\n");
+		System.out.println("--------------PARTITION END--------------" + "\n");
 	}
 }

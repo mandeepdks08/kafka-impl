@@ -42,4 +42,8 @@ public class KafkaService {
 			throw new RuntimeException("Topic does not exist");
 		}
 	}
+	
+	public void printTopic(String topic) {
+		topics.get(topic).printTopic();
+	}
 }

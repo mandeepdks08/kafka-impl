@@ -96,4 +96,15 @@ public class Topic {
 		return partitions.get(partitionIndex);
 	}
 
+	public void printTopic() {
+		StringBuilder str = new StringBuilder("");
+		System.out.println("Topic name: " + name + "\n");
+		System.out.println("--------------PARTITIONS--------------" + "\n");
+		str.append("Topic name: " + name + "\n");
+		str.append("--------------PARTITIONS--------------" + "\n");
+		for (Partition partition : partitions) {
+			partition.printPartition();
+		}
+	}
+
 }

@@ -9,5 +9,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class BaseResponse {
 	private String message;
-	private boolean success;
+	private Boolean success;
 }
