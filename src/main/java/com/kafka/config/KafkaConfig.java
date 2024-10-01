@@ -9,7 +9,7 @@ import com.kafka.service.KafkaService;
 public class KafkaConfig {
 	
 	@Bean
-	private KafkaService kafkaService() {
+	public KafkaService kafkaService() {
 		return new KafkaService();
 	}
 }
